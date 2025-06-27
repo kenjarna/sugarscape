@@ -187,22 +187,34 @@ class Temperance(agent.Agent):
     
     # Should somehow include the agent's ethical value of the cell to influence the effects on the agent
     def addHerbConsumptionEffectsToAgent(self) -> None:
-        # Add herb agent effects to sugar and spice, update temperance and amount of herb the agent has
-        self.sugarMetabolism += 0.1
-        self.spiceMetabolism += 0.1
-        self.herb -= self.herbConsumptionRate
-        self.temperanceFactor -= 0.1 # hard coded for now, but should be configurable or calculated
-        
-        # If herb is depleted, the agent still attempted to consume herb, so their temperance
-        # factor decreases, but at a reduce penalty 
+        # Can have cascading effects on happiness, temperance, herb desire, metaobolism, etc. depdening how far we want to take it
         if self.herb == 0:
+            self.herbDesireFactor += 0.2
+            # May need to decrease effect on happiness based on timestamp or prioritizing spice/sugar
+            self.happiness -= 0.2
+            # Agent would have taken it if they could, so they lose temperance at a reduced rate since they didnt have any
             self.temperanceFactor -= 0.05
+        else:
+            self.sugarMetabolism += 0.1
+            self.spiceMetabolism += 0.1
+            self.herb -= self.herbConsumptionRate
+            self.happiness += 0.1
+            
+            if self.temperanceFactor == 0:
+                # Do something special if the agent has no temperance, like decreasing happiness or health?
+                pass
+            else:
+                self.temperanceFactor -= 0.1
+        
         
 
     def doHerbConsumption(self) -> None:
         random = random.random()
-        # TODO: figure out the logic for if a temperant agent that has a high desire for herb should consume it
-        if self.temperanceFactor == 0 or (self.temperanceFactor <= random and self.temperanceFactor <= self.herbDesireFactor):
+        if self.temperanceFactor == 1:
+            # NOOP
+            return 
+        # TODO: figure out the logic for if a temperance agent that has a high desire for herb should consume it
+        elif self.temperanceFactor == 0 or (self.temperanceFactor <= random and self.temperanceFactor <= self.herbDesireFactor):
                 self.addHerbConsumptionEffectsToAgent()
         else:
             # If temperance factor is low, so if the agent chooses to NOT consume herb, their temperance should increase slightly more
@@ -214,6 +226,6 @@ class Temperance(agent.Agent):
                 self.temperanceFactor += 0.05 
             
   
-    def spawnChild(self, childID, birthday, cell, configuration):
+    def spawnChild(self, childID, birthday, cell, configuration) -> "Temperance":
         # Child inherits parent's temperance factor, but is initialized with a temperance factor of 0.5
         return Temperance(childID, birthday, cell, configuration, temperanceFactor=self.temperanceFactor)
