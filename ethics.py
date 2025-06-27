@@ -2,6 +2,8 @@ import agent
 
 import sys
 
+import random
+
 class Bentham(agent.Agent):
     def __init__(self, agentID, birthday, cell, configuration):
         super().__init__(agentID, birthday, cell, configuration)
@@ -171,3 +173,47 @@ class Leader(agent.Agent):
 
     def spawnChild(self, childID, birthday, cell, configuration):
         return Leader(childID, birthday, cell, configuration)
+
+# Temperance agents consume herb, but also have a innate desire to have a certain amount of herb for trade and consumption
+# TODO: Should there be two different modifiers for deciding temperance?
+class Temperance(agent.Agent):
+    def __init__(self, agentID, birthday, cell, configuration, temperanceFactor=0.5):
+        super().__init__(agentID, birthday, cell, configuration)
+        # Temperance agents consume herb in addition to sugar and spice
+        self.herb = 0
+        self.herbConsumptionRate = 0.25
+        self.herbDesireFactor = 0.5  # How much the agent desires holding herb, 0.5 is neutral. This is separate from temperance as trade and prioritizing herb over spice/sugar can influence their decision
+        self.temperanceFactor = temperanceFactor
+    
+    # Should somehow include the agent's ethical value of the cell to influence the effects on the agent
+    def addHerbConsumptionEffectsToAgent(self) -> None:
+        # Add herb agent effects to sugar and spice, update temperance and amount of herb the agent has
+        self.sugarMetabolism += 0.1
+        self.spiceMetabolism += 0.1
+        self.herb -= self.herbConsumptionRate
+        self.temperanceFactor -= 0.1 # hard coded for now, but should be configurable or calculated
+        
+        # If herb is depleted, the agent still attempted to consume herb, so their temperance
+        # factor decreases, but at a reduce penalty 
+        if self.herb == 0:
+            self.temperanceFactor -= 0.05
+        
+
+    def doHerbConsumption(self) -> None:
+        random = random.random()
+        # TODO: figure out the logic for if a temperant agent that has a high desire for herb should consume it
+        if self.temperanceFactor == 0 or (self.temperanceFactor <= random and self.temperanceFactor <= self.herbDesireFactor):
+                self.addHerbConsumptionEffectsToAgent()
+        else:
+            # If temperance factor is low, so if the agent chooses to NOT consume herb, their temperance should increase slightly more
+            # than if their temperance factor is high
+            # Could limit temperanceFactor affects based on desire for herb as well, so if the agent has a high desire for herb, their temperance factor increases less
+            if self.temperanceFactor < 0.5:
+                self.temperanceFactor += 0.1
+            else:
+                self.temperanceFactor += 0.05 
+            
+  
+    def spawnChild(self, childID, birthday, cell, configuration):
+        # Child inherits parent's temperance factor, but is initialized with a temperance factor of 0.5
+        return Temperance(childID, birthday, cell, configuration, temperanceFactor=self.temperanceFactor)
