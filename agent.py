@@ -484,7 +484,6 @@ class Agent:
             self.findCellsInRange()
             self.updateHappiness()
             self.updateValues()
-
     def doTrading(self):
         # If not a trader, skip trading
         if self.tradeFactor == 0:
@@ -630,6 +629,8 @@ class Agent:
             # Negative utilitarian model uses positive and negative utility to find minimum harm
             cells.sort(key = lambda cell: (cell["wealth"]["unhappiness"], cell["wealth"]["happiness"]), reverse = True)
             bestCell = cells[0]["cell"]
+        
+        print(self)
 
         # If additional ordering consideration, select new best cell
         if "Top" in self.decisionModel:
