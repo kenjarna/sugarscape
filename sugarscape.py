@@ -148,6 +148,7 @@ class Sugarscape:
             quadrantIndex = quadrantIndices[i % quadrants]
             randomCell = emptyCells[quadrantIndex].pop()
             agentConfiguration = agentEndowments[i]
+            print(agentConfiguration)
             agentID = self.generateAgentID()
             a = agent.Agent(agentID, self.timestep, randomCell, agentConfiguration)
             if self.configuration["agentLeader"] == True and i == 0:
@@ -1177,11 +1178,12 @@ def verifyConfiguration(configuration):
         if configuration["agentTemperanceFactor"][1] != -1:
             if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
                 print(f"Cannot have agent temperance range of  {configuration['agentTemperanceFactor']}. Disabling agent temperance.")
+                #TODO: does this actually disable temperance feature?
         configuration["agentTemperanceFactor"] = [-1,-1]
     elif configuration["agentTemperanceFactor"][1] > 1:
         if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
             print(f"Cannot have agent maximum temperance factor of {configuration['agentTemperanceFactor'][1]}. Setting agent maximum temperance factor to 0.5.")
-        configuration["agentTemperanceFactor"][1] = 0.5
+        configuration["agentTemperanceFactor"][1] = 1
     
     if configuration["agentTemperanceChangeFactor"][0] < 0:
         if configuration["agentTemperanceFactor"][1] != -1:
@@ -1356,7 +1358,7 @@ if __name__ == "__main__":
                      #TODO: change default value to use float instead of int -- this is an issue with seeding the random values
                      "agentTemperanceFactor": [0.0,1],
                      "agentTemperanceChangeFactor": [0.0,1],
-                     "agentTemperanceEnabled": True,
+                     "agentTemperanceEnabled": False,
                      "agentTradeFactor": [0, 0],
                      "agentUniversalSpice": [0,0],
                      "agentUniversalSugar": [0,0],
