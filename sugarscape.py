@@ -495,6 +495,7 @@ class Sugarscape:
         configs = self.configuration
         aggressionFactor = configs["agentAggressionFactor"]
         baseInterestRate = configs["agentBaseInterestRate"]
+        cognitiveFactor = configs["agentStartingCognitiveFactor"]
         decisionModelFactor = configs["agentDecisionModelFactor"]
         decisionModelLookaheadDiscount = configs["agentDecisionModelLookaheadDiscount"]
         decisionModelLookaheadFactor = configs["agentDecisionModelLookaheadFactor"]
@@ -502,10 +503,12 @@ class Sugarscape:
         diseaseProtectionChance = configs["agentDiseaseProtectionChance"]
         dynamicSelfishnessFactor = configs["agentDynamicSelfishnessFactor"]
         dynamicTemperanceFactor = configs["agentDynamicTemperanceFactor"]
+        emotionalFactor = configs["agentStartingEmotionalFactor"]
         femaleFertilityAge = configs["agentFemaleFertilityAge"]
         femaleInfertilityAge = configs["agentFemaleInfertilityAge"]
         fertilityFactor = configs["agentFertilityFactor"]
         follower = configs["agentLeader"]
+        health = configs["agentStartingHealth"]
         immuneSystemLength = configs["agentImmuneSystemLength"]
         inheritancePolicy = configs["agentInheritancePolicy"]
         lendingFactor = configs["agentLendingFactor"]
@@ -519,7 +522,9 @@ class Sugarscape:
         movement = configs["agentMovement"]
         movementMode = configs["agentMovementMode"]
         neighborhoodMode = configs["neighborhoodMode"]
+        physicalFactor = configs["agentStartingPhysicalFactor"]
         selfishnessFactor = configs["agentSelfishnessFactor"]
+        socialFactor = configs["agentStartingSocialFactor"]
         spiceMetabolism = configs["agentSpiceMetabolism"]
         startingSpice = configs["agentStartingSpice"]
         startingSugar = configs["agentStartingSugar"]
@@ -539,15 +544,18 @@ class Sugarscape:
 
         configurations = {"aggressionFactor": {"endowments": [], "curr": aggressionFactor[0], "min": aggressionFactor[0], "max": aggressionFactor[1]},
                           "baseInterestRate": {"endowments": [], "curr": baseInterestRate[0], "min": baseInterestRate[0], "max": baseInterestRate[1]},
+                          "cognitiveFactor": {"endowments": [], "curr": cognitiveFactor[0], "min": cognitiveFactor[0], "max": socialFactor[1]},
                           "decisionModelFactor": {"endowments": [], "curr": decisionModelFactor[0], "min": decisionModelFactor[0], "max": decisionModelFactor[1]},
                           "decisionModelLookaheadDiscount": {"endowments": [], "curr": decisionModelLookaheadDiscount[0], "min": decisionModelLookaheadDiscount[0], "max": decisionModelLookaheadDiscount[1]},
                           "decisionModelTribalFactor": {"endowments": [], "curr": decisionModelTribalFactor[0], "min": decisionModelTribalFactor[0], "max": decisionModelTribalFactor[1]},
                           "diseaseProtectionChance": {"endowments": [], "curr": diseaseProtectionChance[0], "min": diseaseProtectionChance[0], "max": diseaseProtectionChance[1]},
                           "dynamicSelfishnessFactor": {"endowments": [], "curr": dynamicSelfishnessFactor[0], "min": dynamicSelfishnessFactor[0], "max": dynamicSelfishnessFactor[1]},
                           "dynamicTemperanceFactor": {"endowments": [], "curr": dynamicTemperanceFactor[0], "min": dynamicTemperanceFactor[0], "max": dynamicTemperanceFactor[1]},
+                          "emotionalFactor": {"endowments": [], "curr": emotionalFactor[0], "min": emotionalFactor[0], "max": emotionalFactor[1]},
                           "femaleFertilityAge": {"endowments": [], "curr": femaleFertilityAge[0], "min": femaleFertilityAge[0], "max": femaleFertilityAge[1]},
                           "femaleInfertilityAge": {"endowments": [], "curr": femaleInfertilityAge[0], "min": femaleInfertilityAge[0], "max": femaleInfertilityAge[1]},
                           "fertilityFactor": {"endowments": [], "curr": fertilityFactor[0], "min": fertilityFactor[0], "max": fertilityFactor[1]},
+                          "health": {"endowments": [], "curr": health[0], "min": health[0], "max": health[1]},
                           "lendingFactor": {"endowments": [], "curr": lendingFactor[0], "min": lendingFactor[0], "max": lendingFactor[1]},
                           "loanDuration": {"endowments": [], "curr": loanDuration[0], "min": loanDuration[0], "max": loanDuration[1]},
                           "lookaheadFactor": {"endowments": [], "curr": lookaheadFactor[0], "min": lookaheadFactor[0], "max": lookaheadFactor[1]},
@@ -556,7 +564,9 @@ class Sugarscape:
                           "maxAge": {"endowments": [], "curr": maxAge[0], "min": maxAge[0], "max": maxAge[1]},
                           "maxFriends": {"endowments": [], "curr": maxFriends[0], "min": maxFriends[0], "max": maxFriends[1]},
                           "movement": {"endowments": [], "curr": movement[0], "min": movement[0], "max": movement[1]},
+                          "physicalFactor": {"endowments": [], "curr": physicalFactor[0], "min": physicalFactor[0], "max": physicalFactor[1]},
                           "selfishnessFactor": {"endowments": [], "curr": selfishnessFactor[0], "min": selfishnessFactor[0], "max": selfishnessFactor[1]},
+                          "socialFactor": {"endowments": [], "curr": socialFactor[0], "min": socialFactor[0], "max": socialFactor[1]},
                           "spice": {"endowments": [], "curr": startingSpice[0], "min": startingSpice[0], "max": startingSpice[1]},
                           "spiceMetabolism": {"endowments": [], "curr": spiceMetabolism[0], "min": spiceMetabolism[0], "max": spiceMetabolism[1]},
                           "sugar": {"endowments": [], "curr": startingSugar[0], "min": startingSugar[0], "max": startingSugar[1]},
@@ -1521,6 +1531,58 @@ def verifyConfiguration(configuration):
         if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
             print(f"Cannot have agent maximum dynamic temperance factor of {configuration['agentDynamicTemperanceFactor'][1]}. Setting agent maximum dynamic temperance change to 1.0.")
         configuration["agentDynamicTemperanceFactor"][1] = 1.0
+    
+    if configuration["agentStartingHealth"][0] < 0:
+        if configuration["agentStartingHealth"][1] != -1:
+            if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+                print(f"Cannot have agent health factor of {configuration['agentStartingHealth']}. Disabling agent temperance.")
+        configuration["agentStartingHealth"] = [-1,-1]
+    elif configuration["agentStartingHealth"][1] > 10:
+        if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+            print(f"Cannot have agent maximum health factor of {configuration['agentStartingHealth'][1]}. Setting agent maximum health to 10.0.")
+        configuration["agentStartingHealth"][1] = 10.0
+    
+    if configuration["agentStartingCognitiveFactor"][0] < 0:
+        if configuration["agentStartingCognitiveFactor"][1] != -1:
+            if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+                print(f"Cannot have agent dynamic health factor of {configuration['agentStartingCognitiveFactor']}. Disabling agent temperance.")
+        configuration["agentStartingCognitiveFactor"] = [-1,-1]
+    elif configuration["agentStartingCognitiveFactor"][1] > 10:
+        if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+            print(f"Cannot have agent maximum dynamic temperance factor of {configuration['agentStartingCognitiveFactor'][1]}. Setting agent maximum cognitive factor to 10.0.")
+        configuration["agentStartingCognitiveFactor"][1] = 10.0
+    
+    if configuration["agentStartingEmotionalFactor"][0] < 0:
+        if configuration["agentStartingEmotionalFactor"][1] != -1:
+            if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+                print(f"Cannot have agent dynamic health factor of {configuration['agentStartingEmotionalFactor']}. Disabling agent temperance.")
+        configuration["agentStartingEmotionalFactor"] = [-1,-1]
+    elif configuration["agentStartingEmotionalFactor"][1] > 10:
+        if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+            print(f"Cannot have agent maximum emotional factor of {configuration['agentStartingEmotionalFactor'][1]}. Setting agent maximum emotional factor  to 10.0.")
+        configuration["agentStartingEmotionalFactor"][1] = 10.0
+    
+    if configuration["agentStartingPhysicalFactor"][0] < 0:
+        if configuration["agentStartingPhysicalFactor"][1] != -1:
+            if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+                print(f"Cannot have agent physical factor of {configuration['agentStartingPhysicalFactor']}. Disabling agent temperance.")
+        configuration["agentStartingPhysicalFactor"] = [-1,-1]
+    elif configuration["agentStartingPhysicalFactor"][1] > 10:
+        if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+            print(f"Cannot have agent maximum physical factor of {configuration['agentStartingPhysicalFactor'][1]}. Setting agent maximum physical factor to 10.0.")
+        configuration["agentStartingPhysicalFactor"][1] = 10.0
+    
+    if configuration["agentStartingSocialFactor"][0] < 0:
+        if configuration["agentStartingSocialFactor"][1] != -1:
+            if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+                print(f"Cannot have agent social factor of {configuration['agentStartingSocialFactor']}. Disabling agent temperance.")
+        configuration["agentStartingSocialFactor"] = [-1,-1]
+    elif configuration["agentStartingSocialFactor"][1] > 10:
+        if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
+            print(f"Cannot have agent maximum social factor of {configuration['agentStartingSocialFactor'][1]}. Setting agent maximum social factor to 10.0.")
+        configuration["agentStartingSocialFactor"][1] = 10.0
+
+
 
     if configuration["agentTagStringLength"] < 0:
         if "all" in configuration["debugMode"] or "agent" in configuration["debugMode"]:
@@ -1644,6 +1706,11 @@ if __name__ == "__main__":
                      "agentSpiceMetabolism": [0, 0],
                      "agentStartingSpice": [0, 0],
                      "agentStartingSugar": [10, 40],
+                     "agentStartingHealth": [0,10],
+                     "agentStartingPhysicalFactor": [0,0],
+                     "agentStartingEmotionalFactor": [0,0],
+                     "agentStartingSocialFactor": [0,0],
+                     "agentStartingCognitiveFactor": [0,0],
                      "agentSugarMetabolism": [1, 4],
                      "agentTagging": False,
                      "agentTagPreferences": False,
